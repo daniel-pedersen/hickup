@@ -5,6 +5,9 @@ import { spawn } from "child_process"
 const killTimeout = 10000
 
 function spawner() {
+  if (process.argv.length < 3) {
+    process.exit(1)
+  }
   return spawn(process.argv[2], process.argv.slice(3), { stdio: "inherit" })
 }
 
