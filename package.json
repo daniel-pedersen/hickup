@@ -1,0 +1,21 @@
+{
+  "name": "hickup",
+  "version": "0.0.1",
+  "description": "Restarts any command on SIGHUP",
+  "main": "dist/hickup.js",
+  "scripts": {
+    "build": "gulp",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Daniel Pedersen",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-core": "^6.3.21",
+    "gulp": "^3.9.0",
+    "gulp-babel": "^6.1.1"
+  },
+  "bin": {
+    "hickup": "dist/hickup.js"
+  },
+  "preferGlobal": true
+}
