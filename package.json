@@ -1,10 +1,10 @@
 {
   "name": "hickup",
-  "version": "0.0.2",
-  "description": "Restarts any command on SIGHUP",
-  "main": "dist/hickup.js",
+  "version": "0.1.2",
+  "description": "Restarts anything on a SIGHUP",
+  "main": "./dist/hickup.js",
   "scripts": {
-    "build": "gulp",
+    "prepublish": "gulp",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -20,7 +20,15 @@
     "gulp-chmod": "^1.3.0"
   },
   "bin": {
-    "hickup": "dist/hickup.js"
+    "hickup": "./dist/hickup.js"
   },
-  "preferGlobal": true
+  "preferGlobal": true,
+  "keywords": [
+    "restart",
+    "reload",
+    "signal",
+    "development",
+    "docker",
+    "terminal"
+  ]
 }
