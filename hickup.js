@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import net from "net"
 import { spawn } from "child_process"
 
 const killTimeout = 10000
@@ -59,10 +60,9 @@ function cleanUp() {
         clearTimeout(timeout)
         timeout = null
       }
-    } else {
-      process.stdin.resume()
     }
   }
 }
 
 spawnChild()
+net.createServer().listen() // Stayin' alive

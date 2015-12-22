@@ -1,6 +1,6 @@
 {
   "name": "hickup",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Restarts anything on a SIGHUP",
   "main": "./dist/hickup.js",
   "scripts": {
@@ -14,6 +14,7 @@
   "author": "Daniel Pedersen",
   "license": "MIT",
   "devDependencies": {
+    "babel-preset-es2015": "^6.1.18",
     "babel-core": "^6.3.21",
     "gulp": "^3.9.0",
     "gulp-babel": "^6.1.1",
@@ -30,5 +31,10 @@
     "development",
     "docker",
     "terminal"
-  ]
+  ],
+  "babel": {
+    "presets": [
+      "es2015"
+    ]
+  }
 }
