@@ -1,68 +1,114 @@
 #!/usr/bin/env node
-
-import net from "net"
 import { spawn } from "child_process"
+import parseArgs from "minimist"
 
-const killTimeout = 10000
-const relayedSignals = ["SIGILL", "SIGTRAP", "SIGABRT", "SIGIOT", "SIGBUS", "SIGFPE", "SIGUSR1", "SIGSEGV", "SIGUSR2", "SIGPIPE", "SIGALRM", "SIGCHLD", "SIGSTKFLT", "SIGCONT", "SIGTSTP", "SIGBREAK", "SIGTTIN", "SIGTTOU", "SIGURG", "SIGXCPU", "SIGXFSZ", "SIGVTALRM", "SIGPROF", "SIGWINCH", "SIGIO", "SIGPOLL", "SIGLOST", "SIGPWR", "SIGSYS", "SIGUNUSED"]
+const usage = [
+  "Usage: hickup [options] command [arguments]",
+  "",
+  "Options:",
+  "  -t, --timeout ms  time to wait before SIGKILL (default 10000)"
+].join("\n")
 
-let child, timeout, alive, killed
+const { timeout, _: [command, ...args] } = parseArgs(process.argv.slice(2), {
+  alias: { timeout: "t" },
+  default: { timeout: 1e4 },
+  stopEarly: true
+})
 
-if (process.argv.length < 3) {
-  process.exit(1)
+if (command == null) {
+  console.log(usage)
+  process.exit()
 }
 
-process
-  .on("SIGHUP", respawnChild)
-  .on("SIGTERM", killSelf)
-  .on("SIGINT", killSelf)
-  .on("SIGQUIT", killSelf)
-
-relayedSignals.forEach(signal => process.on(signal, () => child.kill(signal)))
+let child
 
 function killSelf() {
-  killChild()
-  process.exit(0)
+  if (child == null) {
+    process.exit()
+  } else {
+    killChild(process.exit)
+  }
 }
 
-function killChild() {
-  killed = true
-  child.kill()
-  if (!timeout) {
-    timeout = setTimeout(() => child.kill("SIGKILL"), killTimeout)
+function killChild(cb) {
+  if (child != null) {
+    let tid = setTimeout(forceKillChild, timeout)
+    child.once("exit", () => {
+      clearTimeout(tid)
+      cb()
+    })
+    child.kill()
+  }
+}
+
+function forceKillChild() {
+  if (child != null) {
+    child.kill("SIGKILL")
   }
 }
 
 function spawnChild() {
-  if (!alive) {
-    child = spawn(process.argv[2], process.argv.slice(3), { stdio: "inherit" })
-      .once("error", cleanUp)
-      .once("exit", cleanUp)
-    alive = true
-    killed = false
-  }
-}
-
-function respawnChild() {
-  if (alive) {
-    killChild()
+  if (child == null) {
+    child = spawn(command, args, { stdio: "inherit" })
+    child.on("exit", onExit).on("error", onError)
   } else {
-    spawnChild()
+    killChild(spawnChild)
   }
 }
 
-function cleanUp() {
-  if (alive) {
-    alive = false
-    if (killed) {
-      respawnChild()
-      if (timeout) {
-        clearTimeout(timeout)
-        timeout = null
-      }
-    }
-  }
+function onExit(code, signal) {
+  child.removeAllListeners()
+  child = null
 }
+
+function onError(err) {
+  throw err
+}
+
+process
+  .on("SIGHUP", spawnChild)
+  .on("SIGTERM", killSelf)
+  .on("SIGINT", killSelf)
+  .on("SIGQUIT", killSelf)
+
+;[
+  "SIGILL",
+  "SIGTRAP",
+  "SIGABRT",
+  "SIGIOT",
+  "SIGBUS",
+  "SIGFPE",
+  "SIGUSR1",
+  "SIGSEGV",
+  "SIGUSR2",
+  "SIGPIPE",
+  "SIGALRM",
+  "SIGCHLD",
+  "SIGSTKFLT",
+  "SIGCONT",
+  "SIGTSTP",
+  "SIGBREAK",
+  "SIGTTIN",
+  "SIGTTOU",
+  "SIGURG",
+  "SIGXCPU",
+  "SIGXFSZ",
+  "SIGVTALRM",
+  "SIGPROF",
+  "SIGWINCH",
+  "SIGIO",
+  "SIGPOLL",
+  "SIGLOST",
+  "SIGPWR",
+  "SIGSYS",
+  "SIGUNUSED"
+].forEach(signal => {
+  process.on(signal, () => {
+    if (child != null) {
+      child.kill(signal)
+    }
+  })
+})
 
 spawnChild()
-net.createServer().listen() // Stayin' alive
+setInterval(() => {}, -1 >>> 1)

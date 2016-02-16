@@ -1,27 +1,25 @@
 {
   "name": "hickup",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "description": "Restarts anything on a SIGHUP",
-  "main": "./dist/hickup.js",
+  "main": "./bin/hickup.js",
   "scripts": {
-    "prepublish": "gulp",
+    "build": "babel hickup.js -o bin/hickup.js; chmod 755 bin/hickup.js;",
+    "prepublish": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/daniel-pedersen/hickup"
-  },
+  "repository": "daniel-pedersen/hickup",
   "author": "Daniel Pedersen",
   "license": "MIT",
+  "dependencies": {
+    "minimist": "^1.2.0"
+  },
   "devDependencies": {
-    "babel-preset-es2015": "^6.1.18",
-    "babel-core": "^6.3.21",
-    "gulp": "^3.9.0",
-    "gulp-babel": "^6.1.1",
-    "gulp-chmod": "^1.3.0"
+    "babel-cli": "^6.5.1",
+    "babel-preset-es2015": "^6.5.0"
   },
   "bin": {
-    "hickup": "./dist/hickup.js"
+    "hickup": "./bin/hickup.js"
   },
   "preferGlobal": true,
   "keywords": [
@@ -29,8 +27,7 @@
     "reload",
     "signal",
     "development",
-    "docker",
-    "terminal"
+    "utility"
   ],
   "babel": {
     "presets": [
